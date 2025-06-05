@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Keep all your existing head content -->
+    <!-- ... -->
+</head>
+<body>
+    <!-- Keep all your existing HTML structure -->
+    <!-- ... -->
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Connect to the server
+            const socket = io();
+            
+            // Keep your existing DOM elements
+            // ...
+            
+            // Modify your existing functions:
+            
+            // Function to send a message
+            function sendMessage() {
+                const text = messageInput.value.trim();
+                if (text === '' || !currentUser) return;
+                
+                socket.emit('sendMessage', {
+                    text: text
+                });
+                
+                messageInput.value = '';
+            }
+            
+            // Function to handle login
+            function handleLogin() {
+                const username = document.getElementById('login-username').value.trim();
+                const password = document.getElementById('login-password').value.trim();
+                
+                if (!username || !password) {
+                    showError(loginError, "Please enter both username and password");
+                    return;
+                }
+                
+                // For now, we'll skip password verification on the client
+                // In a real app, you'd want proper authentication
+                currentUser = {
+                    id: '', // Will be set by server
+                    username: username
+                };
+                
+                // Hide login modal and show chat
+                loginModal.style.display = 'none';
+                chatContainer.style.display = 'flex';
+                
+                // Update UI
+                updateUsernameDisplay();
+                
+                // Join the chat
+                socket.emit('join', username);
+                
+                // Focus the input field
+                messageInput.focus();
+            }
+            
+            // Socket.io event listeners
+            socket.on('message', (message) => {
+                displayMessage(message);
+            });
+            
+            socket.on('messageHistory', (history) => {
+                chatMessages.innerHTML = '';
+                history.forEach(message => {
+                    displayMessage(message);
+                });
+            });
+            
+            // Remove the localStorage-related code (saveChatToStorage, etc.)
+            // Keep the rest of your existing code
+        });
+    </script>
+</body>
+</html>
